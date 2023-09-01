@@ -16,7 +16,7 @@ export class AppService {
     private readonly shortenUrlRepository: Repository<ShortenUrl>,
   ) {}
 
-  private generateRandomString() {
+  private generateRandomString(): string {
     let result = '';
     let counter = 0;
     while (counter < +process.env.URL_LENGTH) {
@@ -58,6 +58,9 @@ export class AppService {
     if (!existedUrl) {
       throw new NotFoundException("Shorten url doesn't exist");
     }
+
+    existedUrl.usage_count += 1;
+    this.shortenUrlRepository.save(existedUrl);
 
     let returnedUrl = '';
     if (
