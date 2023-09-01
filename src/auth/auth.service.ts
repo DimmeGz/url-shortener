@@ -20,7 +20,7 @@ export class AuthService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  createAccessToken(userId: number): { accessToken: string } {
+  private createAccessToken(userId: number): { accessToken: string } {
     return { accessToken: this.jwtService.sign({ id: userId }) };
   }
 
@@ -74,6 +74,17 @@ export class AuthService {
       throw new UnauthorizedException(
         'Username or password may be incorrect. Please try again',
       );
+    }
+  }
+
+  verifyToken(authHeader: string) {
+    const token = authHeader.split(' ')[1];
+
+    try {
+      const user = this.jwtService.verify(token);
+      return user;
+    } catch (e) {
+      return null;
     }
   }
 }

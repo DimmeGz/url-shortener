@@ -10,6 +10,7 @@ import { DB_CONFIG, VALIDATION_SCHEMA } from './config';
 import { ShortenUrl, User } from './entities';
 import { REDIS_URLS } from './constants';
 import { AuthModule } from './auth/auth.module';
+import { AuthService } from './auth/auth.service';
 
 @Module({
   imports: [
@@ -18,11 +19,11 @@ import { AuthModule } from './auth/auth.module';
       validationSchema: VALIDATION_SCHEMA,
     }),
     TypeOrmModule.forRoot(DB_CONFIG),
-    TypeOrmModule.forFeature([ShortenUrl]),
+    TypeOrmModule.forFeature([ShortenUrl, User]),
     RedisModule.register(REDIS_URLS),
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AuthService],
 })
 export class AppModule {}

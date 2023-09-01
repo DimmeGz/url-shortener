@@ -8,6 +8,7 @@ import { ShortenUrl } from './entities';
 import { AVAILABLE_SYMBOLS, REDIS_URLS, SYMBOLS_LENGTH } from './constants';
 
 import { config } from 'dotenv';
+import { AuthService } from './auth/auth.service';
 config();
 
 @Injectable()
@@ -16,6 +17,7 @@ export class AppService {
     @InjectRepository(ShortenUrl)
     private readonly shortenUrlRepository: Repository<ShortenUrl>,
     @Inject(REDIS_URLS) private readonly redisUrls: Redis,
+    private readonly authService: AuthService,
   ) {}
 
   private generateRandomString(): string {
@@ -30,7 +32,7 @@ export class AppService {
     return result;
   }
 
-  async createUrl(url: string): Promise<ShortenUrl> {
+  async createUrl(url: string, authToken?: string): Promise<ShortenUrl> {
     let newUrl: ShortenUrl;
     while (!newUrl) {
       const randomString = this.generateRandomString();
@@ -47,6 +49,11 @@ export class AppService {
         shorten_url: randomString,
         usage_count: 0,
       });
+    }
+
+    if (authToken) {
+      const user = this.authService.verifyToken(authToken);
+      newUrl.owner = user;
     }
 
     return await this.shortenUrlRepository.save(newUrl);
