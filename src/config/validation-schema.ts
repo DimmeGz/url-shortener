@@ -13,4 +13,5 @@ export const VALIDATION_SCHEMA = Joi.object({
   REDIS_USERNAME: Joi.string().allow(null, '').optional(),
   REDIS_PASSWORD: Joi.string().allow(null, '').optional(),
   REDIS_DB_URLS: Joi.number().required(),
+  JWT_SECRET: Joi.string().required(),
 });

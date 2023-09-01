@@ -5,9 +5,9 @@ import Redis from 'ioredis';
 
 import { UrlInterface } from './interfaces';
 import { ShortenUrl } from './entities';
+import { AVAILABLE_SYMBOLS, REDIS_URLS, SYMBOLS_LENGTH } from './constants';
 
 import { config } from 'dotenv';
-import { AVAILABLE_SYMBOLS, REDIS_URLS, SYMBOLS_LENGTH } from './constants';
 config();
 
 @Injectable()
