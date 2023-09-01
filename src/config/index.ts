@@ -1,1 +1,2 @@
-export * from './validation-schema'
+export * from './db.config';
+export * from './validation-schema';
