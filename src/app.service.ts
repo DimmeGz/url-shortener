@@ -57,10 +57,11 @@ export class AppService {
       newUrl.owner = user;
     }
 
-    const redisKey = newUrl.owner
-      ? `a:${newUrl.shorten_url}`
-      : `u:${newUrl.shorten_url}`;
-    this.redisUrls.set(redisKey, url);
+    const redisValue = {
+      u: url,
+      a: newUrl.owner ? 1 : 0,
+    };
+    this.redisUrls.set(newUrl.shorten_url, JSON.stringify(redisValue));
 
     return await this.shortenUrlRepository.save(newUrl);
   }
@@ -72,24 +73,19 @@ export class AppService {
   }
 
   async redirect(shortenUrl: string): Promise<UrlInterface> {
-    const redisKeys = await this.redisUrls.keys(`*:${shortenUrl}`);
+    const rawRedisValue = await this.redisUrls.get(shortenUrl);
 
-    if (!redisKeys.length) {
+    if (!rawRedisValue) {
       throw new NotFoundException("Shorten url doesn't exist");
     }
 
-    const redisKey = redisKeys[0];
-    const [isAuthorized] = redisKey.split(':');
+    const parsedRedisValue = JSON.parse(rawRedisValue);
 
-    if (isAuthorized === 'a') {
-      const existedUrl = await this.shortenUrlRepository.findOne({
-        where: { shorten_url: shortenUrl },
-      });
-      existedUrl.usage_count += 1;
-      this.shortenUrlRepository.save(existedUrl);
+    if (parsedRedisValue.a === 1) {
+      this.updateUsageCount(shortenUrl);
     }
 
-    let returnedUrl = await this.redisUrls.get(redisKey);
+    let returnedUrl = parsedRedisValue.u;
     if (
       !returnedUrl.startsWith('http://') &&
       !returnedUrl.startsWith('https://')
@@ -98,5 +94,18 @@ export class AppService {
     }
 
     return { url: returnedUrl };
+  }
+
+  private async updateUsageCount(shortenUrl: string) {
+    const existedUrl = await this.shortenUrlRepository.findOne({
+      where: { shorten_url: shortenUrl },
+    });
+
+    if (!existedUrl) {
+      return;
+    }
+
+    existedUrl.usage_count += 1;
+    this.shortenUrlRepository.save(existedUrl);
   }
 }
