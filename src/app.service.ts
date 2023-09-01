@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Redis from 'ioredis';
@@ -13,13 +18,17 @@ import { config } from 'dotenv';
 config();
 
 @Injectable()
-export class AppService {
+export class AppService implements OnModuleInit {
   constructor(
     @InjectRepository(ShortenUrl)
     private readonly shortenUrlRepository: Repository<ShortenUrl>,
     @Inject(REDIS_URLS) private readonly redisUrls: Redis,
     private readonly authService: AuthService,
   ) {}
+
+  async onModuleInit() {
+    await this.populateRedisFromDb();
+  }
 
   private generateRandomString(): string {
     let result = '';
@@ -107,5 +116,24 @@ export class AppService {
 
     existedUrl.usage_count += 1;
     this.shortenUrlRepository.save(existedUrl);
+  }
+
+  private async populateRedisFromDb() {
+    const allUrls = await this.shortenUrlRepository.find({
+      relations: ['owner'],
+    });
+    if (!allUrls.length) {
+      return;
+    }
+
+    const redisObj = {};
+    for (const url of allUrls) {
+      redisObj[url.shorten_url] = JSON.stringify({
+        u: url.full_url,
+        a: url.owner ? 1 : 0,
+      });
+    }
+
+    await this.redisUrls.mset(redisObj);
   }
 }
