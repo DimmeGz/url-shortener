@@ -59,6 +59,12 @@ export class AppService {
     return await this.shortenUrlRepository.save(newUrl);
   }
 
+  async getUserUrls(userId: number): Promise<ShortenUrl[]> {
+    return await this.shortenUrlRepository.find({
+      where: { owner: { id: userId } },
+    });
+  }
+
   async redirect(shortenUrl: string): Promise<UrlInterface> {
     const existedUrl = await this.shortenUrlRepository.findOne({
       where: { shorten_url: shortenUrl },

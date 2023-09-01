@@ -6,9 +6,13 @@ import {
   Param,
   Post,
   Redirect,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { CreateShortenUrlDTO, UrlParamDTO } from './dto';
+import { JwtGuard } from './auth/guards';
+import { UrlsRequest } from './interfaces';
 
 @Controller()
 export class AppController {
@@ -20,6 +24,12 @@ export class AppController {
     @Headers('Authorization') authToken?: string,
   ) {
     return this.appService.createUrl(createUrlDTO.url, authToken);
+  }
+
+  @Get('user-urls')
+  @UseGuards(JwtGuard)
+  getUserUrls(@Req() req: UrlsRequest) {
+    return this.appService.getUserUrls(req.user.id);
   }
 
   @Get(':shortenUrl')
