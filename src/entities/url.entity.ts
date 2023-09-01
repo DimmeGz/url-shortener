@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from './user.entity';
 
 @Entity()
 export class ShortenUrl extends BaseEntity {
@@ -13,4 +21,8 @@ export class ShortenUrl extends BaseEntity {
 
   @Column()
   usage_count: number;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'user_id' })
+  owner: User;
 }
