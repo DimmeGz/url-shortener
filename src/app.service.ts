@@ -36,16 +36,17 @@ export class AppService {
         where: { shorten_url: randomString },
       });
 
-      if (!existedUrl) {
-        newUrl = this.shortenUrlRepository.create({
-          full_url: data.url,
-          shorten_url: randomString,
-          usage_count: 0,
-        });
+      if (existedUrl) {
+        continue;
       }
+
+      newUrl = this.shortenUrlRepository.create({
+        full_url: data.url,
+        shorten_url: randomString,
+        usage_count: 0,
+      });
     }
 
-    await this.shortenUrlRepository.save(newUrl);
-    return newUrl;
+    return await this.shortenUrlRepository.save(newUrl);
   }
 }
