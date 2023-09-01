@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -48,5 +48,27 @@ export class AppService {
     }
 
     return await this.shortenUrlRepository.save(newUrl);
+  }
+
+  async redirect(shortenUrl: string) {
+    const existedUrl = await this.shortenUrlRepository.findOne({
+      where: { shorten_url: shortenUrl },
+    });
+
+    if (!existedUrl) {
+      throw new NotFoundException("Shorten url doesn't exist");
+    }
+
+    let returnedUrl = '';
+    if (
+      !existedUrl.full_url.startsWith('http://') ||
+      !existedUrl.full_url.startsWith('https://')
+    ) {
+      returnedUrl = 'https://' + existedUrl.full_url;
+    } else {
+      returnedUrl = existedUrl.full_url;
+    }
+
+    return { url: returnedUrl };
   }
 }

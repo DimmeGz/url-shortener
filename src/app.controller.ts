@@ -1,6 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Redirect } from '@nestjs/common';
 import { AppService } from './app.service';
-import { CreateShortenUrlDTO } from './dto';
+import { CreateShortenUrlDTO, UrlParamDTO } from './dto';
 
 @Controller()
 export class AppController {
@@ -9,5 +9,11 @@ export class AppController {
   @Post('create-url')
   createUrl(@Body() createUrlDTO: CreateShortenUrlDTO) {
     return this.appService.createUrl(createUrlDTO);
+  }
+
+  @Get(':shortenUrl')
+  @Redirect()
+  async redirect(@Param() { shortenUrl }: UrlParamDTO) {
+    return this.appService.redirect(shortenUrl);
   }
 }
