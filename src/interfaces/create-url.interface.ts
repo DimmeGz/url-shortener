@@ -1,3 +1,3 @@
-export interface CreateShortenUrl {
+export interface UrlInterface {
   url: string;
 }

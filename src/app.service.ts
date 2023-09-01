@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CreateShortenUrl } from './interfaces';
+import { UrlInterface } from './interfaces';
 import { ShortenUrl } from './entities';
 
 import { config } from 'dotenv';
@@ -28,7 +28,7 @@ export class AppService {
     return result;
   }
 
-  async createUrl(data: CreateShortenUrl) {
+  async createUrl(url: string): Promise<ShortenUrl> {
     let newUrl: ShortenUrl;
     while (!newUrl) {
       const randomString = this.generateRandomString();
@@ -41,7 +41,7 @@ export class AppService {
       }
 
       newUrl = this.shortenUrlRepository.create({
-        full_url: data.url,
+        full_url: url,
         shorten_url: randomString,
         usage_count: 0,
       });
@@ -50,7 +50,7 @@ export class AppService {
     return await this.shortenUrlRepository.save(newUrl);
   }
 
-  async redirect(shortenUrl: string) {
+  async redirect(shortenUrl: string): Promise<UrlInterface> {
     const existedUrl = await this.shortenUrlRepository.findOne({
       where: { shorten_url: shortenUrl },
     });

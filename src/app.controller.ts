@@ -8,7 +8,7 @@ export class AppController {
 
   @Post('create-url')
   createUrl(@Body() createUrlDTO: CreateShortenUrlDTO) {
-    return this.appService.createUrl(createUrlDTO);
+    return this.appService.createUrl(createUrlDTO.url);
   }
 
   @Get(':shortenUrl')
