@@ -79,7 +79,7 @@ export class AppService {
 
     let returnedUrl = '';
     if (
-      !existedUrl.full_url.startsWith('http://') ||
+      !existedUrl.full_url.startsWith('http://') &&
       !existedUrl.full_url.startsWith('https://')
     ) {
       returnedUrl = 'https://' + existedUrl.full_url;
