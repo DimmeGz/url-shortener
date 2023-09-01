@@ -1,0 +1,4 @@
+export const AVAILABLE_SYMBOLS =
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+export const SYMBOLS_LENGTH = AVAILABLE_SYMBOLS.length;

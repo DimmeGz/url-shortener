@@ -7,4 +7,5 @@ export const VALIDATION_SCHEMA = Joi.object({
   DB_USER: Joi.string().required(),
   DB_PASSWORD: Joi.string().required(),
   DB_NAME: Joi.string().required(),
+  URL_LENGTH: Joi.number().required(),
 });
