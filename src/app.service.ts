@@ -1,12 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import Redis from 'ioredis';
 
 import { UrlInterface } from './interfaces';
 import { ShortenUrl } from './entities';
 
 import { config } from 'dotenv';
-import { AVAILABLE_SYMBOLS, SYMBOLS_LENGTH } from './constants';
+import { AVAILABLE_SYMBOLS, REDIS_URLS, SYMBOLS_LENGTH } from './constants';
 config();
 
 @Injectable()
@@ -14,6 +15,7 @@ export class AppService {
   constructor(
     @InjectRepository(ShortenUrl)
     private readonly shortenUrlRepository: Repository<ShortenUrl>,
+    @Inject(REDIS_URLS) private readonly redisUrls: Redis,
   ) {}
 
   private generateRandomString(): string {

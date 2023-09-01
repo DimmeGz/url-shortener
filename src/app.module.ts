@@ -2,17 +2,23 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { RedisModule } from './redis/redis.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { DB_CONFIG, VALIDATION_SCHEMA } from './config';
 import { ShortenUrl } from './entities';
+import { REDIS_URLS } from './constants';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ validationSchema: VALIDATION_SCHEMA }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: VALIDATION_SCHEMA,
+    }),
     TypeOrmModule.forRoot(DB_CONFIG),
     TypeOrmModule.forFeature([ShortenUrl]),
+    RedisModule.register(REDIS_URLS),
   ],
   controllers: [AppController],
   providers: [AppService],
