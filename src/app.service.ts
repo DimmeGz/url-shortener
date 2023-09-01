@@ -15,6 +15,7 @@ import { ShortenUrl } from './entities';
 import { AVAILABLE_SYMBOLS, REDIS_URLS, SYMBOLS_LENGTH } from './constants';
 
 import { config } from 'dotenv';
+import { JwtService } from '@nestjs/jwt';
 config();
 
 @Injectable()
@@ -23,7 +24,7 @@ export class AppService implements OnModuleInit {
     @InjectRepository(ShortenUrl)
     private readonly shortenUrlRepository: Repository<ShortenUrl>,
     @Inject(REDIS_URLS) private readonly redisUrls: Redis,
-    private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async onModuleInit() {
@@ -62,7 +63,7 @@ export class AppService implements OnModuleInit {
     }
 
     if (authToken) {
-      const user = this.authService.verifyToken(authToken);
+      const user = this.verifyToken(authToken);
       newUrl.owner = user;
     }
 
@@ -135,5 +136,16 @@ export class AppService implements OnModuleInit {
     }
 
     await this.redisUrls.mset(redisObj);
+  }
+
+  private verifyToken(authHeader: string) {
+    const token = authHeader.split(' ')[1];
+
+    try {
+      const user = this.jwtService.verify(token);
+      return user;
+    } catch (e) {
+      return null;
+    }
   }
 }

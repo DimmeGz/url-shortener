@@ -76,15 +76,4 @@ export class AuthService {
       );
     }
   }
-
-  verifyToken(authHeader: string) {
-    const token = authHeader.split(' ')[1];
-
-    try {
-      const user = this.jwtService.verify(token);
-      return user;
-    } catch (e) {
-      return null;
-    }
-  }
 }
