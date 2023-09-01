@@ -3,12 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Redis from 'ioredis';
 
+import { AuthService } from './auth/auth.service';
+
 import { UrlInterface } from './interfaces';
 import { ShortenUrl } from './entities';
 import { AVAILABLE_SYMBOLS, REDIS_URLS, SYMBOLS_LENGTH } from './constants';
 
 import { config } from 'dotenv';
-import { AuthService } from './auth/auth.service';
 config();
 
 @Injectable()
@@ -56,6 +57,11 @@ export class AppService {
       newUrl.owner = user;
     }
 
+    const redisKey = newUrl.owner
+      ? `a:${newUrl.shorten_url}`
+      : `u:${newUrl.shorten_url}`;
+    this.redisUrls.set(redisKey, url);
+
     return await this.shortenUrlRepository.save(newUrl);
   }
 
@@ -66,25 +72,29 @@ export class AppService {
   }
 
   async redirect(shortenUrl: string): Promise<UrlInterface> {
-    const existedUrl = await this.shortenUrlRepository.findOne({
-      where: { shorten_url: shortenUrl },
-    });
+    const redisKeys = await this.redisUrls.keys(`*:${shortenUrl}`);
 
-    if (!existedUrl) {
+    if (!redisKeys.length) {
       throw new NotFoundException("Shorten url doesn't exist");
     }
 
-    existedUrl.usage_count += 1;
-    this.shortenUrlRepository.save(existedUrl);
+    const redisKey = redisKeys[0];
+    const [isAuthorized] = redisKey.split(':');
 
-    let returnedUrl = '';
+    if (isAuthorized === 'a') {
+      const existedUrl = await this.shortenUrlRepository.findOne({
+        where: { shorten_url: shortenUrl },
+      });
+      existedUrl.usage_count += 1;
+      this.shortenUrlRepository.save(existedUrl);
+    }
+
+    let returnedUrl = await this.redisUrls.get(redisKey);
     if (
-      !existedUrl.full_url.startsWith('http://') &&
-      !existedUrl.full_url.startsWith('https://')
+      !returnedUrl.startsWith('http://') &&
+      !returnedUrl.startsWith('https://')
     ) {
-      returnedUrl = 'https://' + existedUrl.full_url;
-    } else {
-      returnedUrl = existedUrl.full_url;
+      returnedUrl = 'https://' + returnedUrl;
     }
 
     return { url: returnedUrl };
