@@ -33,7 +33,6 @@ describe('AppController', () => {
     }).compile();
 
     appController = app.get<AppController>(AppController);
-    // appService = app.get<AppService>(AppService);
   });
 
   describe('root', () => {
