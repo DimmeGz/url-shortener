@@ -1,3 +1,5 @@
+Another URL shortener with a simple authorization system and usage statistics
+
 1. POST '/signup'</br>
 Register new user. Body:
 ```
