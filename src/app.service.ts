@@ -8,8 +8,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Redis from 'ioredis';
 
-import { AuthService } from './auth/auth.service';
-
 import { UrlInterface } from './interfaces';
 import { ShortenUrl } from './entities';
 import { AVAILABLE_SYMBOLS, REDIS_URLS, SYMBOLS_LENGTH } from './constants';

@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { LoginDto, SignupDto } from './dto';
-import { User } from 'src/entities';
+import { User } from '../entities';
 
 @Injectable()
 export class AuthService {
@@ -53,9 +53,7 @@ export class AuthService {
       });
 
       if (!user) {
-        throw new NotFoundException(
-          'User with such username and password not found',
-        );
+        throw new Error();
       }
 
       const passwordMatch = await argon2.verify(

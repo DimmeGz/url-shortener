@@ -1,11 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AppService } from './app.service';
-// import { AuthService } from './auth/auth.service';
-import { ShortenUrl, User } from './entities';
+import { ShortenUrl } from './entities';
 import { REDIS_URLS } from './constants';
-import { Connection } from 'typeorm';
-import { AuthService } from './auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 
 const undefinedFindOne = undefined;
@@ -48,7 +45,6 @@ describe('AppService', () => {
             save: jest.fn().mockReturnValue(createdShortenUrl),
           },
         },
-
         {
           provide: REDIS_URLS,
           useValue: {
