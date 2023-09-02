@@ -1,0 +1,1 @@
+Most of the load on this service is data reading. So, for scaling, you will need to replicate the SQL and Redis and split the service into parts: one part will be responsible only for writing data (scalable only vertically), and the other - for reading data and redirect (scalable horizontally).
