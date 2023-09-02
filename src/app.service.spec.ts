@@ -33,7 +33,7 @@ describe('AppService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [JwtModule.register({ secret: process.env.JWT_SECRET })],
+      imports: [JwtModule.register({ secret: 'secret' })],
       providers: [
         AppService,
         {
