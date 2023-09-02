@@ -41,9 +41,9 @@ export class AuthService {
       firstName: newUser.firstName,
       lastName: newUser.lastName,
     });
-    this.usersRepository.save(user);
+    const createdUser = await this.usersRepository.save(user);
 
-    return this.createAccessToken(user.id);
+    return this.createAccessToken(createdUser.id);
   }
 
   async login(user: LoginDto): Promise<{ accessToken: string }> {
@@ -62,9 +62,7 @@ export class AuthService {
       );
 
       if (!passwordMatch) {
-        throw new NotFoundException(
-          'User with such username and password not found',
-        );
+        throw new Error();
       }
 
       return this.createAccessToken(existingUser.id);

@@ -1,5 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { ShortenUrl, User } from 'src/entities';
+import { ShortenUrl, User } from '../entities';
 
 export const DB_CONFIG: TypeOrmModuleOptions = {
   type: 'postgres',
